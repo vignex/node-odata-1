@@ -1,37 +1,50 @@
 module.exports = function (req) {
 
   var auth = require('./auth');
-  var oquery = require('./oquery');
+  var Oquery = require('./oquery');
+  var Q = require('q');
 
   function createServices(endpoints) {
     var services = {};
 
+    var names = [];
+    var calls = [];
+
     for (var e in endpoints) {
       if (e === 'authUrl') {
-        services.login = auth(req, endpoints.authUrl).login;
+        var d = Q.defer();
+        calls.push(d.promise);
+        d.resolve({login: auth(req, endpoints.authUrl).login});
       } else {
-        services[e] = createService(endpoints[e]);
+        calls.push(createService(e, endpoints[e]));
       }
     }
 
-    return services;
+    return Q.allSettled(calls);
   }
 
-  function createService(url) {
+  function createService(name, url) {
+    var deferred = Q.defer();
+
     req({
       url: url
-    }, function (err, res, body) {
+    }, function serviceRequest(err, res, body) {
       if (err) {
-        console.log(err);
+        deferred.reject(err);
         return;
       }
 
-      var i, service;
-      for (i = 0; i < res.value.length; i += 1) {
+      var service = {};
+      for (var i = 0; i < res.value.length; i += 1) {
         service[res.value[i].name] = new Oquery(url + res.value[i].url);
       }
-      return service;
+
+      var s = {};
+      s[name] = service;
+      deferred.resolve(s);
     });
+
+    return deferred.promise;
   }
 
   return {

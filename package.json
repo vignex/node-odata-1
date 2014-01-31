@@ -2,10 +2,15 @@
   "name": "node-odata",
   "version": "0.0.1",
   "description": "node odata client",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/zclark/node-odata.git"
+  },
   "main": "src/odata.js",
   "dependencies": {
     "request": "~2.33.0",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "q": "~1.0.0"
   },
   "devDependencies": {
     "mocha": "~1.17.1",
