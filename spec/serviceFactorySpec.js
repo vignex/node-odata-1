@@ -16,14 +16,9 @@ describe('serviceFactory', function () {
 
       var promise = factory.createServices({authUrl: 'someUrl'});
       promise.then(function (results) {
-        try {
-          results.forEach(function (result) {
-            expect(result.value.login).to.exist;
-          });
-        } catch (err) {
-          done(err);
-          return;
-        }
+        results.forEach(function (result) {
+          expect(result.value.login).to.exist;
+        });
         done();
       });
     });
@@ -46,14 +41,9 @@ describe('serviceFactory', function () {
 
       var promise = factory.createServices({test: 'test/'});
       promise.then(function (results) {
-        try {
-          results.forEach(function (result) {
-            expect(result.reason).to.equal('error');
-          });
-        } catch (err) {
-          done(err);
-          return;
-        }
+        results.forEach(function (result) {
+          expect(result.reason).to.equal('error');
+        });
         done();
       });
     });
@@ -70,18 +60,11 @@ describe('serviceFactory', function () {
 
       var promise = factory.createServices({test: 'test/'});
       promise.then(function (results) {
-        try {
-          var e1created = false;
-          var e2created = false;
-          results.forEach(function (result) {
-            expect(result.value.test).to.exist;
-            expect(result.value.test.e1.rootUrl).to.equal('test/end1');
-            expect(result.value.test.e2.rootUrl).to.equal('test/end2');
-          });
-        } catch (err) {
-          done(err);
-          return;
-        }
+        results.forEach(function (result) {
+          expect(result.value.test).to.exist;
+          expect(result.value.test.e1.rootUrl).to.equal('test/end1');
+          expect(result.value.test.e2.rootUrl).to.equal('test/end2');
+        });
         done();
       });
     });
