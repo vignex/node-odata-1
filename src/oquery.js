@@ -19,6 +19,22 @@ oquery.prototype.orderby = function () {
   return this;
 };
 
+oquery.prototype.skip = function () {
+  return this;
+};
+
+oquery.prototype.top = function () {
+  return this;
+};
+
+oquery.prototype.inlinecount = function () {
+  return this;
+};
+
+oquery.prototype.select = function () {
+  return this;
+};
+
 oquery.prototype.toUrl = function () {
   var url = this.rootUrl;
   // add id from opts
