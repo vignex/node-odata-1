@@ -4,26 +4,25 @@ node-odata
 An odata client module for Node
 [![Build Status](https://travis-ci.org/zclark/node-odata.png?branch=master)](https://travis-ci.org/zclark/node-odata)
 
-## Initial Idea
+## Usage
 
-User should be able to set up multitude of odata service endpoints
+This module generates endpoints based from odata service urls
 
 ```javascript
 var client = new OData([url1, url2, url3]);
 ```
 
-And it should return an object with all the services requested
-with endpoints for each type it finds on the service
-
+This will return a promise containing the potential generated endpoints for each service queried
 
 ```javascript
-var client = new OData([{name: 'serviceOne', url: 'url1'}]);
-
-var endpoint = client.serviceOne.someEndpoint;
+var client = new OData([{name: 'serviceOne', url: 'url1'}]).then(function (results) {
+  endpoints.forEach(function (result) {
+    // endpoints of the form - result.value = { serviceOne: { generatedEndpoints... }}
+  });
+});
 
 var result = endpoint.get(1).orderby('someKey');
 ```
 
 Endpoints should be chainable, and support either get, put, post, delete
-followed by where, orderby, filter, or expand (and all the other odata options
-as we go along)
+followed by where, orderby, filter, expand, skip, top, inlinecount, and select
