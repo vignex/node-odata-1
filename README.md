@@ -16,7 +16,7 @@ This will return a promise containing the potential generated endpoints for each
 
 ```javascript
 var client = new OData([{name: 'serviceOne', url: 'url1'}]).then(function (results) {
-  endpoints.forEach(function (result) {
+  results.forEach(function (result) {
     // endpoints of the form - result.value = { serviceOne: { generatedEndpoints... }}
   });
 });
