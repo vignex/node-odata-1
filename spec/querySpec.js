@@ -7,41 +7,52 @@ describe('query', function () {
   describe('request', function () {
 
     it('should return the returned data', function () {
+
       function dataSuccess(o, cb) {
+
         cb(null, {statusCode: 200}, 'data');
       }
 
       var service = query(dataSuccess);
       service.request({}, function (err, data) {
+
         expect(data).to.equal('data');
       });
     });
 
     it('should return an error when the request errors', function () {
+
       function error(o, cb) {
+
         cb('ERROR');
       }
 
       var service = query(error);
       service.request({}, function (err) {
+
         expect(err).to.equal('ERROR');
       });
     });
 
     it('should return an error if the request returns non 200', function () {
+
       function fail(o, cb) {
+
         cb(null, {statusCode: 400});
       }
 
       var service = query(fail);
       service.request({}, function (err) {
+
         expect(err).to.equal('odata request failed');
       });
     });
 
     it('should default to GET', function () {
+
       var method;
       var service = query(function (o) {
+
         method = o.method;
       });
 
@@ -50,8 +61,10 @@ describe('query', function () {
     });
 
     it('should append the cookie if passed', function () {
+
       var cookie;
       var service = query(function (o) {
+
         cookie = o.headers.Cookie;
       });
 
@@ -60,8 +73,10 @@ describe('query', function () {
     });
 
     it('should add prefix "?" for the first option and "&" for subsequent options', function () {
+
       var url;
       var service = query(function (o) {
+
         url = o.url;
       });
 
@@ -70,8 +85,10 @@ describe('query', function () {
     });
 
     it('should add (id) if "id" is a specified', function () {
+
       var url;
       var service = query(function (o) {
+
         url = o.url;
       });
 
@@ -80,8 +97,10 @@ describe('query', function () {
     });
 
     it('should add the id if id is 0', function () {
+
       var url;
       var service = query(function (o) {
+
         url = o.url;
       });
 
@@ -90,8 +109,10 @@ describe('query', function () {
     });
 
     it('should add $filter if specified', function () {
+
       var url;
       var service = query(function (o) {
+
         url = o.url;
       });
 
@@ -100,8 +121,10 @@ describe('query', function () {
     });
 
     it('should add $orderby if specified', function () {
+
       var url;
       var service = query(function (o) {
+
         url = o.url;
       });
 
@@ -110,8 +133,10 @@ describe('query', function () {
     });
 
     it('should add $expand if specified', function () {
+
       var url;
       var service = query(function (o) {
+
         url = o.url;
       });
 

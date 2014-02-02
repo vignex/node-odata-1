@@ -5,6 +5,7 @@ module.exports = function (req) {
   var Q = require('q');
 
   function createServices(endpoints) {
+
     var services = {};
 
     var names = [];
@@ -24,11 +25,13 @@ module.exports = function (req) {
   }
 
   function createService(name, url) {
+
     var deferred = Q.defer();
 
     req({
       url: url
     }, function serviceRequest(err, res, body) {
+
       if (err) {
         deferred.reject(err);
         return;

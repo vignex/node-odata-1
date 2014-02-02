@@ -1,6 +1,7 @@
 module.exports = function query(req) {
 
   function tweakOptions(options) {
+
     options.method = 'GET';
     if (options.cookie) {
       options.headers = {
@@ -33,11 +34,14 @@ module.exports = function query(req) {
   }
 
   function createAppend(option, extra) {
+
     return (extra ? '&' : '?') + option;
   }
 
   function request(options, callback) {
+
     req(tweakOptions(options), function odataCallback(err, res, body) {
+
       if (err) {
         callback(err);
       } else if (res.statusCode !== 200) {

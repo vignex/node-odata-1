@@ -5,6 +5,7 @@ var serviceFactory = require('../src/serviceFactory');
 describe('serviceFactory', function () {
 
   it('should expose a createServices function', function () {
+
     var factory = serviceFactory({});
     expect(typeof factory.createServices).to.equal('function');
   });
@@ -12,11 +13,14 @@ describe('serviceFactory', function () {
   describe('createServices', function () {
 
     it('should add a login service if authUrl endpoint passed', function (done) {
+
       var factory = serviceFactory({});
 
       var promise = factory.createServices({authUrl: 'someUrl'});
       promise.then(function (results) {
+
         results.forEach(function (result) {
+
           expect(result.value.login).to.exist;
         });
         done();
@@ -24,8 +28,10 @@ describe('serviceFactory', function () {
     });
 
     it('should query the urls of each endpoint passed', function () {
+
       var urls = [];
       var factory = serviceFactory(function (args) {
+
         urls.push(args.url);
       });
 
@@ -35,13 +41,17 @@ describe('serviceFactory', function () {
     });
 
     it('should result an error if a url causes an error', function (done) {
+
       var factory = serviceFactory(function (args, cb) {
+
         cb('error', {name: 'e1', url: 'end1'});
       });
 
       var promise = factory.createServices({test: 'test/'});
       promise.then(function (results) {
+
         results.forEach(function (result) {
+
           expect(result.reason).to.equal('error');
         });
         done();
@@ -49,7 +59,9 @@ describe('serviceFactory', function () {
     });
 
     it('should add an endpoint for each url result', function (done) {
+
       var factory = serviceFactory(function (args, cb) {
+
         cb(null, {
           value: [
             {name: 'e1', url: 'end1'},
@@ -60,7 +72,9 @@ describe('serviceFactory', function () {
 
       var promise = factory.createServices({test: 'test/'});
       promise.then(function (results) {
+
         results.forEach(function (result) {
+
           expect(result.value.test).to.exist;
           expect(result.value.test.e1.rootUrl).to.equal('test/end1');
           expect(result.value.test.e2.rootUrl).to.equal('test/end2');

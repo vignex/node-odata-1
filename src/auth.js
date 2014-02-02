@@ -1,6 +1,7 @@
 module.exports = function auth(req, url) {
 
   function login(username, password, callback) {
+
     req({
       url: url,
       method: 'POST',
@@ -10,6 +11,7 @@ module.exports = function auth(req, url) {
         createPersistentCookie: true
       }
     }, function (err, res, body) {
+
       if (err) {
         callback(err);
       } else if (res.statusCode !== 200) {

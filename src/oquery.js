@@ -1,25 +1,31 @@
 var util = require('util');
 
-function oquery(url) {
+
+function oquery(url, req) {
+
   if (!url) {
-    throw 'Cannot create a query with a URL';
+    throw 'Cannot create a query without a URL';
   }
   this.rootUrl = url;
+  this.req = req;
 }
 
+
 oquery.prototype.get = function (id) {
+
   this.q = { id: id };
   return this;
 };
 
 
-
 oquery.prototype.expand = function (arr) {
+
   this.q.expand = arr;
   return this;
 };
 
 oquery.prototype.createExpand = function () {
+
   if (!this.q.expand) {
     return '';
   }
@@ -39,11 +45,13 @@ oquery.prototype.createExpand = function () {
 
 // eq, ne, gt, lt
 oquery.prototype.filter = function (exp) {
+
   this.q.filter = exp;
   return this;
 };
 
 oquery.prototype.createFilter = function () {
+
   if (!this.q.filter) {
     return '';
   }
@@ -55,11 +63,13 @@ oquery.prototype.createFilter = function () {
 
 
 oquery.prototype.orderby = function (exp) {
+
   this.q.orderby = exp;
   return this;
 };
 
 oquery.prototype.createOrderby = function () {
+
   if (!this.q.orderby) {
     return '';
   }
@@ -71,11 +81,13 @@ oquery.prototype.createOrderby = function () {
 
 
 oquery.prototype.skip = function (count) {
+
   this.q.skip = count;
   return this;
 };
 
 oquery.prototype.createSkip = function () {
+
   if (!this.q.skip) {
     return '';
   }
@@ -88,11 +100,13 @@ oquery.prototype.createSkip = function () {
 
 
 oquery.prototype.top = function (count) {
+
   this.q.top = count;
   return this;
 };
 
 oquery.prototype.createTop = function () {
+
   if (!this.q.top) {
     return '';
   }
@@ -105,11 +119,13 @@ oquery.prototype.createTop = function () {
 
 
 oquery.prototype.inlinecount = function () {
+
   this.q.inlinecount = true;
   return this;
 };
 
 oquery.prototype.createInlinecount = function () {
+
   if (!this.q.inlinecount) {
     return '';
   }
@@ -121,6 +137,7 @@ oquery.prototype.createInlinecount = function () {
 
 
 oquery.prototype.select = function (props) {
+
   this.q.select = props;
   // from this point the query can expand
   // and filter further, but will be a task for later
@@ -128,6 +145,7 @@ oquery.prototype.select = function (props) {
 };
 
 oquery.prototype.createSelect = function () {
+
   if (!this.q.select) {
     return '';
   }
@@ -139,6 +157,7 @@ oquery.prototype.createSelect = function () {
 
 
 oquery.prototype.toUrl = function () {
+
   var url = this.rootUrl;
   if (this.q.id) {
     url += '(' + this.q.id + ')';
@@ -154,6 +173,54 @@ oquery.prototype.toUrl = function () {
 
 
   return url;
+};
+
+
+oquery.prototype.fire = function (cb) {
+
+  this.req({
+    url: this.toUrl()
+  }).then(function (err, res, body) {
+
+    if (err) {
+      return cb(e);
+    }
+
+    return cb(null, res.data);
+  });
+};
+
+
+oquery.prototype.insert = function () {
+
+  this.req({
+    url: this.rootUrl,
+    method: 'POST'
+  }).then(function () {
+
+  });
+};
+
+
+oquery.prototype.update = function (id) {
+
+  this.req({
+    url: this.rootUrl + '(' + id + ')',
+    method: 'PUT'
+  }).then(function () {
+
+  });
+};
+
+
+oquery.prototype.delete = function (id) {
+
+  this.req({
+    url: this.rootUrl + (' + id + '),
+    method: 'DELETE'
+  }).then(function () {
+
+  });
 };
 
 
