@@ -144,4 +144,115 @@ describe('oquery', function () {
     expect(result.toUrl()).to.equal(fakeUrl + '$select=thing1,thing2');
   });
 
+  it('should hit the built url on fire()', function () {
+
+    var query = new oquery(fakeUrl);
+    query.req = function (args) {
+
+      expect(args.url).to.equal(query.toUrl());
+      return { then: function () {} };
+    };
+    query.get(1).fire();
+  });
+
+  it('should return an error of fire error', function () {
+
+    var query = new oquery(fakeUrl);
+    query.req = function () {
+
+      return {
+        then: function (cb) {
+
+          return cb('FAIL');
+        }
+      };
+    };
+
+    query.get(1).fire(function (error) {
+
+      expect(error).to.equal('FAIL');
+    });
+  });
+
+  it('should return the data on fire success', function () {
+
+    var query = new oquery(fakeUrl);
+    query.req = function () {
+
+      return {
+        then: function (cb) {
+
+          return cb(null, { data: 'DATA' });
+        }
+      };
+    };
+
+    query.get(1).fire(function (err, res) {
+
+      expect(res).to.equal('DATA');
+    });
+  });
+
+  it('should use the rootUrl and POST for insert()', function () {
+
+    var query = new oquery(fakeUrl);
+    var usedArgs;
+    query.req = function (args) {
+
+      usedArgs = args;
+      return {
+        then: function (cb) {
+
+          return cb();
+        }
+      }
+    };
+
+    query.insert();
+    expect(usedArgs.url).to.equal(query.rootUrl);
+    expect(usedArgs.method).to.equal('POST');
+  });
+
+  it('should use the rootUrl + id and PUT for update()', function () {
+
+    var query = new oquery(fakeUrl);
+    var usedArgs;
+
+    query.req = function (args) {
+
+      usedArgs = args;
+      return {
+        then: function (cb) {
+
+          return cb();
+        }
+      };
+    };
+
+    query.update(2);
+    expect(usedArgs.url).to.equal(query.rootUrl + '(2)');
+    expect(usedArgs.method).to.equal('PUT');
+  });
+
+  it('should use the rootUrl + id and DELETE for delete()', function () {
+
+    var query = new oquery(fakeUrl);
+    var usedArgs;
+
+    query.req = function (args) {
+
+      usedArgs = args;
+      return {
+        then: function (cb) {
+
+          return cb();
+        }
+      };
+    };
+
+    query.delete(3);
+    expect(usedArgs.url).to.equal(query.rootUrl + '(3)');
+    expect(usedArgs.method).to.equal('DELETE');
+  });
+
 });

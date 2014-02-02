@@ -183,7 +183,7 @@ oquery.prototype.fire = function (cb) {
   }).then(function (err, res, body) {
 
     if (err) {
-      return cb(e);
+      return cb(err);
     }
 
     return cb(null, res.data);
@@ -216,7 +216,7 @@ oquery.prototype.update = function (id) {
 oquery.prototype.delete = function (id) {
 
   this.req({
-    url: this.rootUrl + (' + id + '),
+    url: this.rootUrl + '(' + id + ')',
     method: 'DELETE'
   }).then(function () {
 
