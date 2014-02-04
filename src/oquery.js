@@ -1,42 +1,27 @@
 var util = require('util');
 
-
-function oquery(url, req) {
-
-  if (!url) {
-    throw 'Cannot create a query without a URL';
-  }
-  this.rootUrl = url;
-  this.req = req;
-}
-
-
-oquery.prototype.get = function (id) {
-
-  this.q = { id: id };
-  return this;
-};
+function oquery() { }
 
 
 oquery.prototype.expand = function (arr) {
 
-  this.q.expand = arr;
+  this._expand = arr;
   return this;
 };
 
-oquery.prototype.createExpand = function () {
+oquery.prototype._createExpand = function () {
 
-  if (!this.q.expand) {
+  if (!this._expand) {
     return '';
   }
 
   var e = '$expand=';
-  if (!util.isArray(this.q.expand)) {
-    return e + this.q.expand;
+  if (!util.isArray(this._expand)) {
+    return e + this._expand;
   }
 
-  for (var i = 0; i < this.q.expand.length; i += 1) {
-    e += this.q.expand[i] + ',';
+  for (var i = 0; i < this._expand.length; i += 1) {
+    e += this._expand[i] + ',';
   }
   // remove last comma
   return e.slice(0, e.length - 1);
@@ -46,54 +31,54 @@ oquery.prototype.createExpand = function () {
 // eq, ne, gt, lt
 oquery.prototype.filter = function (exp) {
 
-  this.q.filter = exp;
+  this._filter = exp;
   return this;
 };
 
-oquery.prototype.createFilter = function () {
+oquery.prototype._createFilter = function () {
 
-  if (!this.q.filter) {
+  if (!this._filter) {
     return '';
   }
 
   var f = '$filter=';
-  return f + this.q.filter;
+  return f + this._filter;
 };
 
 
 
 oquery.prototype.orderby = function (exp) {
 
-  this.q.orderby = exp;
+  this._orderby = exp;
   return this;
 };
 
-oquery.prototype.createOrderby = function () {
+oquery.prototype._createOrderby = function () {
 
-  if (!this.q.orderby) {
+  if (!this._orderby) {
     return '';
   }
 
   var o = '$orderby=';
-  return o + this.q.orderby;
+  return o + this._orderby;
 };
 
 
 
 oquery.prototype.skip = function (count) {
 
-  this.q.skip = count;
+  this._skip = count;
   return this;
 };
 
-oquery.prototype.createSkip = function () {
+oquery.prototype._createSkip = function () {
 
-  if (!this.q.skip) {
+  if (!this._skip) {
     return '';
   }
 
   var s = '$skip=';
-  return s + this.q.skip;
+  return s + this._skip;
 };
 
 
@@ -101,18 +86,18 @@ oquery.prototype.createSkip = function () {
 
 oquery.prototype.top = function (count) {
 
-  this.q.top = count;
+  this._top = count;
   return this;
 };
 
-oquery.prototype.createTop = function () {
+oquery.prototype._createTop = function () {
 
-  if (!this.q.top) {
+  if (!this._top) {
     return '';
   }
 
   var t = '$top=';
-  return t + this.q.top;
+  return t + this._top;
 };
 
 
@@ -120,13 +105,13 @@ oquery.prototype.createTop = function () {
 
 oquery.prototype.inlinecount = function () {
 
-  this.q.inlinecount = true;
+  this._inlinecount = true;
   return this;
 };
 
-oquery.prototype.createInlinecount = function () {
+oquery.prototype._createInlinecount = function () {
 
-  if (!this.q.inlinecount) {
+  if (!this._inlinecount) {
     return '';
   }
 
@@ -138,90 +123,43 @@ oquery.prototype.createInlinecount = function () {
 
 oquery.prototype.select = function (props) {
 
-  this.q.select = props;
+  this._select = props;
   // from this point the query can expand
   // and filter further, but will be a task for later
   return this;
 };
 
-oquery.prototype.createSelect = function () {
+oquery.prototype._createSelect = function () {
 
-  if (!this.q.select) {
+  if (!this._select) {
     return '';
   }
 
-  return '$select=' + this.q.select;
+  return '$select=' + this._select;
 };
 
 
+oquery.prototype._appendConnector = function (url) {
 
-
-oquery.prototype.toUrl = function () {
-
-  var url = this.rootUrl;
-  if (this.q.id) {
-    url += '(' + this.q.id + ')';
+  if (url) {
+    url += '&';
   }
-
-  url += this.createExpand();
-  url += this.createFilter();
-  url += this.createOrderby();
-  url += this.createSkip();
-  url += this.createTop();
-  url += this.createInlinecount();
-  url += this.createSelect();
-
-
   return url;
 };
 
 
-oquery.prototype.fire = function (cb) {
+oquery.prototype.toUrl = function () {
 
-  this.req({
-    url: this.toUrl()
-  }).then(function (err, res, body) {
+  var url = '';
+  url += this._createExpand();
+  url += this._createFilter();
+  url += this._createOrderby();
+  url += this._createSkip();
+  url += this._createTop();
+  url += this._createInlinecount();
+  url += this._createSelect();
 
-    if (err) {
-      return cb(err);
-    }
-
-    return cb(null, res.data);
-  });
+  return url;
 };
-
-
-oquery.prototype.insert = function () {
-
-  this.req({
-    url: this.rootUrl,
-    method: 'POST'
-  }).then(function () {
-
-  });
-};
-
-
-oquery.prototype.update = function (id) {
-
-  this.req({
-    url: this.rootUrl + '(' + id + ')',
-    method: 'PUT'
-  }).then(function () {
-
-  });
-};
-
-
-oquery.prototype.delete = function (id) {
-
-  this.req({
-    url: this.rootUrl + '(' + id + ')',
-    method: 'DELETE'
-  }).then(function () {
-
-  });
-};
-
 
 module.exports = oquery;

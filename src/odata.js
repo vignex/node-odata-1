@@ -7,5 +7,9 @@ var req = request.defaults({
 });
 
 var serviceFactory = require('./serviceFactory')(req);
+var oquery = require('./oquery');
 
-module.exports = serviceFactory.createServices;
+module.exports = {
+  createServices: serviceFactory.createServices,
+  Oquery: oquery
+};

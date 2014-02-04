@@ -20,9 +20,28 @@ var client = new OData([{name: 'serviceOne', url: 'url1'}]).then(function (resul
     // endpoints of the form - result.value = { serviceOne: { generatedEndpoints... }}
   });
 });
-
-var result = endpoint.get(1).orderby('someKey');
 ```
 
-Endpoints should be chainable, and support either get, put, post, delete
-followed by where, orderby, filter, expand, skip, top, inlinecount, and select
+Each endpoint has a get function
+```javascript
+var query = new oquery(1).filter().top(10);
+var result = endpoint.get(query);
+```
+
+An insert function
+```javascript
+endpoint.insert(data);
+```
+
+An update function
+```javascript
+endpoint.update(1, data);
+```
+
+And a delete function
+```javascript``
+endpoint.delete(1);
+```
+
+An oquery is built from an optional id
+followed by orderby, filter, expand, skip, top, inlinecount, and select
