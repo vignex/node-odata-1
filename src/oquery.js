@@ -1,6 +1,18 @@
 var util = require('util');
 
-function oquery() { }
+function oquery(id) {
+
+  this._id = id;
+}
+
+
+oquery.prototype._createId = function (arr) {
+
+  if (this._id === 0 || this._id) {
+    return '(' + this._id + ')';
+  }
+  return '';
+};
 
 
 oquery.prototype.expand = function (arr) {
@@ -35,14 +47,14 @@ oquery.prototype.filter = function (exp) {
   return this;
 };
 
-oquery.prototype._createFilter = function () {
+oquery.prototype._createFilter = function (url) {
 
   if (!this._filter) {
     return '';
   }
 
   var f = '$filter=';
-  return f + this._filter;
+  return this._appendConnector(url) + f + this._filter;
 };
 
 
@@ -53,14 +65,14 @@ oquery.prototype.orderby = function (exp) {
   return this;
 };
 
-oquery.prototype._createOrderby = function () {
+oquery.prototype._createOrderby = function (url) {
 
   if (!this._orderby) {
     return '';
   }
 
   var o = '$orderby=';
-  return o + this._orderby;
+  return this._appendConnector(url) + o + this._orderby;
 };
 
 
@@ -71,14 +83,14 @@ oquery.prototype.skip = function (count) {
   return this;
 };
 
-oquery.prototype._createSkip = function () {
+oquery.prototype._createSkip = function (url) {
 
   if (!this._skip) {
     return '';
   }
 
   var s = '$skip=';
-  return s + this._skip;
+  return this._appendConnector(url) + s + this._skip;
 };
 
 
@@ -90,14 +102,14 @@ oquery.prototype.top = function (count) {
   return this;
 };
 
-oquery.prototype._createTop = function () {
+oquery.prototype._createTop = function (url) {
 
   if (!this._top) {
     return '';
   }
 
   var t = '$top=';
-  return t + this._top;
+  return this._appendConnector(url) + t + this._top;
 };
 
 
@@ -109,13 +121,13 @@ oquery.prototype.inlinecount = function () {
   return this;
 };
 
-oquery.prototype._createInlinecount = function () {
+oquery.prototype._createInlinecount = function (url) {
 
   if (!this._inlinecount) {
     return '';
   }
 
-  return '$inlinecount=allpages';
+  return this._appendConnector(url) + '$inlinecount=allpages';
 };
 
 
@@ -129,37 +141,35 @@ oquery.prototype.select = function (props) {
   return this;
 };
 
-oquery.prototype._createSelect = function () {
+oquery.prototype._createSelect = function (url) {
 
   if (!this._select) {
     return '';
   }
 
-  return '$select=' + this._select;
+  return this._appendConnector(url) + '$select=' + this._select;
 };
 
 
 oquery.prototype._appendConnector = function (url) {
 
-  if (url) {
-    url += '&';
-  }
-  return url;
+  return url ? '&' : '';
 };
 
 
 oquery.prototype.toUrl = function () {
 
   var url = '';
-  url += this._createExpand();
-  url += this._createFilter();
-  url += this._createOrderby();
-  url += this._createSkip();
-  url += this._createTop();
-  url += this._createInlinecount();
-  url += this._createSelect();
 
-  return url;
+  url += this._createExpand(url);
+  url += this._createFilter(url);
+  url += this._createOrderby(url);
+  url += this._createSkip(url);
+  url += this._createTop(url);
+  url += this._createInlinecount(url);
+  url += this._createSelect(url);
+
+  return this._createId() + url;
 };
 
 module.exports = oquery;

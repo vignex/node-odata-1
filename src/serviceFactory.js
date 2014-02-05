@@ -39,48 +39,67 @@ module.exports = function (req) {
 
       var service = {};
       for (var i = 0; i < res.value.length; i += 1) {
-        console.log(res.value[i].name);
         service[res.value[i].name] = {
           get: function (query, cb) {
 
-            // fire request
+            var q = query ? query.toUrl() : '';
             req({
               method: 'GET',
-              url: url + query.toUrl()
-            }).then(function (err, res, body) {
-              // body...
+              url: url + q
+            }, function (err, res, body) {
+
+              if (err) {
+                return cb(err);
+              }
+
+              return cb(null, res.data);
             });
           },
+
           insert: function (data, cb) {
 
-            // fire request
             req({
               method: 'POST',
               url: url,
               data: data
-            }).then(function (err, res, body) {
-              // body...
+            }, function (err, res, body) {
+
+              if (err) {
+                return cb(err);
+              }
+
+              return cb(null, res.data);
             });
           },
+
           update: function (id, data, cb) {
 
-            // fire request
             req({
               method: 'PUT',
               url: url + '(' + id + ')',
               data: data
-            }).then(function (err, res, body) {
-              // body...
+            }, function (err, res, body) {
+
+              if (err) {
+                return cb(err);
+              }
+
+              return cb(null, res.data);
             });
           },
+
           delete: function (id, cb) {
 
-            // fire request
             req({
               method: 'DELETE',
               url: url + '(' + id + ')',
-            }).then(function (err, res, body) {
-              // body...
+            }, function (err, res, body) {
+
+              if (err) {
+                return cb(err);
+              }
+
+              return cb(null, res.data);
             });
           }
         };
@@ -97,5 +116,4 @@ module.exports = function (req) {
   return {
     createServices: createServices
   };
-
 };

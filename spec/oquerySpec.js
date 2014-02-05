@@ -4,11 +4,24 @@ var oquery = require('../src/oquery');
 
 describe('oquery', function () {
 
+  it('should accept an id in the constructor', function () {
+
+    var query = new oquery(1);
+    expect(query._id).to.equal(1);
+  });
+
   it('should have an expand function that returns this', function () {
 
     var query = new oquery();
     var result = query.expand();
     expect(query).to.equal(result);
+  });
+
+  it('should append a connecting & if two modifiers are used', function () {
+
+    var query = new oquery();
+    query.expand(1).filter(2);
+    expect(query.toUrl()).to.equal('$expand=1&$filter=2');
   });
 
 
@@ -64,6 +77,13 @@ describe('oquery', function () {
 
     var query = new oquery();
     expect(query.toUrl()).to.equal('');
+  });
+
+
+  it('should add (id) if passed in constructor', function () {
+
+    var query = new oquery(1);
+    expect(query.toUrl()).to.equal('(1)');
   });
 
 

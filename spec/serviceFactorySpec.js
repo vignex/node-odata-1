@@ -1,6 +1,7 @@
 var chai = require('chai');
 var expect = chai.expect;
 var serviceFactory = require('../src/serviceFactory');
+var oquery = require('../src/oquery');
 
 describe('serviceFactory', function () {
 
@@ -76,17 +77,165 @@ describe('serviceFactory', function () {
 
       var promise = factory.createServices({test: 'test/'});
       promise.then(function (results) {
-        console.log('resolved');
         results.forEach(function (result) {
-          console.log(result);
           expect(result.value.test).to.exist;
-          //expect(result.value.test.e1.rootUrl).to.equal('test/end1');
-          //expect(result.value.test.e2.rootUrl).to.equal('test/end2');
+          expect(typeof result.value.test.e1.get).to.equal('function');
+          expect(typeof result.value.test.e2.get).to.equal('function');
         });
         done();
       });
     });
 
-  });
+    describe('endpoint operations', function () {
 
+      var factory, error, method, calledUrl;
+
+      beforeEach(function () {
+
+        error = false
+        var secondQuery = false;
+        factory = serviceFactory(function (args, cb) {
+
+          if (secondQuery) {
+            calledUrl = args.url;
+            method = args.method;
+            return cb(error ? 'error' : null, { data: 'data' });
+          }
+          secondQuery = true;
+
+          return cb(null, {
+            value: [
+              {name: 'e', url: 'e'}
+            ]
+          }, '');
+        });
+      });
+
+      it('should fire a request to the url on get', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            results[0].value.test.e.get(new oquery(1), function (err, data) {
+
+              expect(method).to.equal('GET');
+              expect(data).to.equal('data');
+              expect(calledUrl).to.equal('test(1)');
+              done();
+            });
+          });
+      });
+
+      it('should fire a GET request on get', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            results[0].value.test.e.get(null, function (err, data) {
+
+              expect(method).to.equal('GET');
+              expect(data).to.equal('data');
+              done();
+            });
+          });
+      });
+
+      it('should return an error on get error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            error = true;
+            results[0].value.test.e.get(null, function (err) {
+
+              expect(err).to.equal('error');
+              done();
+            });
+          });
+      });
+
+      it('should fire a POST request on insert', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            results[0].value.test.e.insert(null, function (err, data) {
+
+              expect(method).to.equal('POST');
+              expect(data).to.equal('data');
+              done();
+            });
+          });
+      });
+
+      it('should return an error on insert error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            error = true;
+            results[0].value.test.e.insert(null, function (err) {
+
+              expect(err).to.equal('error');
+              done();
+            });
+          });
+      });
+
+      it('should fire a PUT request on update', function (done) {
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            results[0].value.test.e.update(1, null, function (err, data) {
+
+              expect(method).to.equal('PUT');
+              expect(data).to.equal('data');
+              done();
+            });
+          });
+      });
+
+      it('should return an error on update error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            error = true;
+            results[0].value.test.e.update(1, null, function (err) {
+
+              expect(err).to.equal('error');
+              done();
+            });
+          });
+      });
+
+      it('should fire a DELETE request on delete', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            results[0].value.test.e.delete(1, function (err, data) {
+
+              expect(method).to.equal('DELETE');
+              expect(data).to.equal('data');
+              done();
+            });
+          });
+      });
+
+      it('should return an error on delete error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            error = true;
+            results[0].value.test.e.delete(null, function (err) {
+
+              expect(err).to.equal('error');
+              done();
+            });
+          });
+      });
+    });
+  });
 });
