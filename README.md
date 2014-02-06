@@ -73,7 +73,7 @@ services.someService.someEndpoint
 ```
 
 And a delete function
-```javascript``
+```javascript
 services.someService.someEndpoint
   .delete(1, cookie, function (err, data) {
   
@@ -81,5 +81,15 @@ services.someService.someEndpoint
   });;
 ```
 
-An oquery is built from an optional id
+### Query Syntax
+An Oquery is built from an optional id
 followed by orderby, filter, expand, skip, top, inlinecount, and select
+```javascript
+var Oqeury = require('odata').Oquery;
+
+var query = new Oquery(1).orderby('id')
+  .filter('state eq 2').expand('someNavProp')
+  .skip(5).top(10).select('someNavProp').inlinecount();
+  
+endpoint.get(query, cookie, function () {});
+```
