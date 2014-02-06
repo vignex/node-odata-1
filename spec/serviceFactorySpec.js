@@ -67,7 +67,7 @@ describe('serviceFactory', function () {
 
       var factory = serviceFactory(function (args, cb) {
 
-        cb(null, {
+        cb(null, null, {
           value: [
             {name: 'e1', url: 'end1'},
             {name: 'e2', url: 'end2'}
@@ -99,11 +99,11 @@ describe('serviceFactory', function () {
           if (secondQuery) {
             calledUrl = args.url;
             method = args.method;
-            return cb(error ? 'error' : null, { data: 'data' });
+            return cb(error ? 'error' : null, null, 'data');
           }
           secondQuery = true;
 
-          return cb(null, {
+          return cb(null, null, {
             value: [
               {name: 'e', url: 'e'}
             ]
@@ -116,11 +116,11 @@ describe('serviceFactory', function () {
         factory.createServices({test: 'test'})
           .then(function (results) {
 
-            results[0].value.test.e.get(new oquery(1), function (err, data) {
+            results[0].value.test.e.get(new oquery(1), null, function (err, data) {
 
               expect(method).to.equal('GET');
               expect(data).to.equal('data');
-              expect(calledUrl).to.equal('test(1)');
+              expect(calledUrl).to.equal('test/e(1)');
               done();
             });
           });
@@ -131,7 +131,7 @@ describe('serviceFactory', function () {
         factory.createServices({test: 'test'})
           .then(function (results) {
 
-            results[0].value.test.e.get(null, function (err, data) {
+            results[0].value.test.e.get(null, null, function (err, data) {
 
               expect(method).to.equal('GET');
               expect(data).to.equal('data');
@@ -146,7 +146,7 @@ describe('serviceFactory', function () {
           .then(function (results) {
 
             error = true;
-            results[0].value.test.e.get(null, function (err) {
+            results[0].value.test.e.get(null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -159,7 +159,7 @@ describe('serviceFactory', function () {
         factory.createServices({test: 'test'})
           .then(function (results) {
 
-            results[0].value.test.e.insert(null, function (err, data) {
+            results[0].value.test.e.insert(null, null, function (err, data) {
 
               expect(method).to.equal('POST');
               expect(data).to.equal('data');
@@ -174,7 +174,7 @@ describe('serviceFactory', function () {
           .then(function (results) {
 
             error = true;
-            results[0].value.test.e.insert(null, function (err) {
+            results[0].value.test.e.insert(null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -186,7 +186,7 @@ describe('serviceFactory', function () {
         factory.createServices({test: 'test'})
           .then(function (results) {
 
-            results[0].value.test.e.update(1, null, function (err, data) {
+            results[0].value.test.e.update(1, null, null, function (err, data) {
 
               expect(method).to.equal('PUT');
               expect(data).to.equal('data');
@@ -201,7 +201,7 @@ describe('serviceFactory', function () {
           .then(function (results) {
 
             error = true;
-            results[0].value.test.e.update(1, null, function (err) {
+            results[0].value.test.e.update(1, null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -214,7 +214,7 @@ describe('serviceFactory', function () {
         factory.createServices({test: 'test'})
           .then(function (results) {
 
-            results[0].value.test.e.delete(1, function (err, data) {
+            results[0].value.test.e.delete(1, null, function (err, data) {
 
               expect(method).to.equal('DELETE');
               expect(data).to.equal('data');
@@ -229,7 +229,7 @@ describe('serviceFactory', function () {
           .then(function (results) {
 
             error = true;
-            results[0].value.test.e.delete(null, function (err) {
+            results[0].value.test.e.delete(null, null, function (err) {
 
               expect(err).to.equal('error');
               done();

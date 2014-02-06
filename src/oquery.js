@@ -169,7 +169,7 @@ oquery.prototype.toUrl = function () {
   url += this._createInlinecount(url);
   url += this._createSelect(url);
 
-  return this._createId() + url;
+  return this._createId() + (url ? ('?' + url) : url);
 };
 
 module.exports = oquery;

@@ -3,7 +3,8 @@ var req = request.defaults({
   headers: {
     'Accept': 'application/json'
   },
-  jar: false
+  jar: false,
+  json: true
 });
 
 var serviceFactory = require('./serviceFactory')(req);

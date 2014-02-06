@@ -27,7 +27,7 @@ module.exports = function (req) {
   function createService(name, url) {
 
     var deferred = Q.defer();
-
+    
     req({
       url: url
     }, function serviceRequest(err, res, body) {
@@ -38,71 +38,108 @@ module.exports = function (req) {
       }
 
       var service = {};
-      for (var i = 0; i < res.value.length; i += 1) {
-        service[res.value[i].name] = {
-          get: function (query, cb) {
+      for (var i = 0; i < body.value.length; i += 1) {
+        service[body.value[i].name] = (function (endpointUrl) {
+          return {
+            get: function (query, cookie, cb) {
 
-            var q = query ? query.toUrl() : '';
-            req({
-              method: 'GET',
-              url: url + q
-            }, function (err, res, body) {
+              var q = query ? query.toUrl() : '';
+              req({
+                method: 'GET',
+                url:  url + '/' + endpointUrl + q,
+                headers: {
+                  'Accept': 'application/json',
+                  'Cookie': cookie
+                }
+              }, function (err, res, body) {
 
-              if (err) {
-                return cb(err);
-              }
+                if (err) {
+                  return cb(err);
+                }
 
-              return cb(null, res.data);
-            });
-          },
+                if (body['odata.error']) {
+                  return cb(body);
+                }
 
-          insert: function (data, cb) {
+                return cb(null, body);
+              });
+            },
 
-            req({
-              method: 'POST',
-              url: url,
-              data: data
-            }, function (err, res, body) {
+            insert: function (data, cookie, cb) {
 
-              if (err) {
-                return cb(err);
-              }
+              req({
+                method: 'POST',
+                url: url + '/' + endpointUrl,
+                data: data,
+                headers: {
+                  'Accept': 'application/json',
+                  'Cookie': cookie,
+                  'Content-Type': 'application/json',
+                  'Content-Length': 'nnn'
+                }
+              }, function (err, res, body) {
 
-              return cb(null, res.data);
-            });
-          },
+                if (err) {
+                  return cb(err);
+                }
 
-          update: function (id, data, cb) {
+                if (body['odata.error']) {
+                  return cb(body);
+                }
 
-            req({
-              method: 'PUT',
-              url: url + '(' + id + ')',
-              data: data
-            }, function (err, res, body) {
+                return cb(null, body);
+              });
+            },
 
-              if (err) {
-                return cb(err);
-              }
+            update: function (id, data, cookie, cb) {
 
-              return cb(null, res.data);
-            });
-          },
+              req({
+                method: 'PUT',
+                url: url + '/' + endpointUrl + '(' + id + ')',
+                data: data,
+                headers: {
+                  'Accept': 'application/json',
+                  'Cookie': cookie,
+                  'Content-Type': 'application/json'
+                }
+              }, function (err, res, body) {
 
-          delete: function (id, cb) {
+                if (err) {
+                  return cb(err);
+                }
 
-            req({
-              method: 'DELETE',
-              url: url + '(' + id + ')',
-            }, function (err, res, body) {
+                if (body['odata.error']) {
+                  return cb(body);
+                }
 
-              if (err) {
-                return cb(err);
-              }
+                return cb(null, body);
+              });
+            },
 
-              return cb(null, res.data);
-            });
-          }
-        };
+            delete: function (id, cookie, cb) {
+
+              req({
+                method: 'DELETE',
+                url: url + '/'  + endpointUrl + '(' + id + ')',
+                headers: {
+                  'Accept': 'application/json',
+                  'Cookie': cookie
+                }
+              }, function (err, res, body) {
+
+                if (err) {
+                  return cb(err);
+                }
+
+                if (body['odata.error']) {
+                  return cb(body);
+                }
+
+                return cb(null, body);
+              });
+            }
+          };
+        }(body.value[i].url));
       }
 
       var s = {};

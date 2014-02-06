@@ -21,7 +21,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     query.expand(1).filter(2);
-    expect(query.toUrl()).to.equal('$expand=1&$filter=2');
+    expect(query.toUrl()).to.equal('?$expand=1&$filter=2');
   });
 
 
@@ -91,7 +91,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.expand('navProp');
-    expect(result.toUrl()).to.equal('$expand=navProp');
+    expect(result.toUrl()).to.equal('?$expand=navProp');
   });
 
 
@@ -99,7 +99,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.expand(['prop1', 'prop2']);
-    expect(result.toUrl()).to.equal('$expand=prop1,prop2');
+    expect(result.toUrl()).to.equal('?$expand=prop1,prop2');
   });
 
 
@@ -107,7 +107,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.filter('test eq 2');
-    expect(result.toUrl()).to.equal('$filter=test eq 2');
+    expect(result.toUrl()).to.equal('?$filter=test eq 2');
   });
 
 
@@ -115,7 +115,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.orderby('something desc');
-    expect(result.toUrl()).to.equal('$orderby=something desc');
+    expect(result.toUrl()).to.equal('?$orderby=something desc');
   });
 
 
@@ -123,7 +123,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.skip(20);
-    expect(result.toUrl()).to.equal('$skip=20');
+    expect(result.toUrl()).to.equal('?$skip=20');
   });
 
 
@@ -131,7 +131,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.top(10);
-    expect(result.toUrl()).to.equal('$top=10');
+    expect(result.toUrl()).to.equal('?$top=10');
   });
 
 
@@ -139,7 +139,7 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.inlinecount();
-    expect(result.toUrl()).to.equal('$inlinecount=allpages');
+    expect(result.toUrl()).to.equal('?$inlinecount=allpages');
   });
 
 
@@ -147,6 +147,6 @@ describe('oquery', function () {
 
     var query = new oquery();
     var result = query.select('thing1,thing2');
-    expect(result.toUrl()).to.equal('$select=thing1,thing2');
+    expect(result.toUrl()).to.equal('?$select=thing1,thing2');
   });
 });
