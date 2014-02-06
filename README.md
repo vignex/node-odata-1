@@ -9,38 +9,76 @@ An odata client module for Node
 This module generates endpoints based from odata service urls
 
 ```javascript
-var client = new OData([url1, url2, url3]);
+var odata = require('odata');
+
+odata.createServices([{name: 'name', url: 'url1', {name: 'name2', url: 'url2']);
 ```
 
 This will return a promise containing the potential generated endpoints for each service queried
 
 ```javascript
-var client = new OData([{name: 'serviceOne', url: 'url1'}]).then(function (results) {
-  results.forEach(function (result) {
-    // endpoints of the form - result.value = { serviceOne: { generatedEndpoints... }}
-  });
+odata([{name: 'serviceOne', url: 'url1'}])
+  .then(function (results) {
+  
+    var services = {};
+    results.forEach(function (result) {
+    
+      var service = result.value;
+      for (var i in service) {
+        if (service.hasOwnProperty(i)) {
+          services[i] = service[i];
+        }
+      }
+    });
 });
 ```
 
+If passed a 'authUrl', it will generate a login endpoint which can be used
+to obtain a cookie for subsequent requests.
+```javascript
+services.login('username', 'password', function (error, cookie) {
+
+  // I Have a cookie now
+});
+```
+
+
 Each endpoint has a get function
 ```javascript
-var query = new oquery(1).filter().top(10);
-var result = endpoint.get(query);
+var Oquery = require('odata').Oquery;
+
+services.someService.someEndpoint
+  .get(new Oquery(1).expand('someNavProp'), cookie, function (error, data) {
+
+    // check for errors and do something with data
+  });
 ```
 
 An insert function
 ```javascript
-endpoint.insert(data);
+services.someService.someEndpoint
+  .insert(someJsonItem, cookie, function (err, data) {
+  
+    // check for errors and celebrate success
+  });
 ```
 
 An update function
 ```javascript
-endpoint.update(1, data);
+services.someService.someEndpoint
+  .update(1, someJsonItem, cookie, function (err, data) {
+
+    // check for errors and celebrate success
+  });
 ```
 
 And a delete function
 ```javascript``
-endpoint.delete(1);
+services.someService.someEndpoint
+  .delete(1, cookie, function (err, data) {
+  
+    // check for errors and celebrate success
+  });;
 ```
 
 An oquery is built from an optional id
