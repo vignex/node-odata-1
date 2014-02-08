@@ -4,6 +4,13 @@ node-odata
 An odata client module for Node
 [![Build Status](https://travis-ci.org/zclark/node-odata.png?branch=master)](https://travis-ci.org/zclark/node-odata)
 
+## Installation
+
+```bash
+npm install nodata
+```
+
+
 ## Usage
 
 This module generates endpoints based from odata service urls
