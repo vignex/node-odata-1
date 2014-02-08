@@ -27,7 +27,7 @@ module.exports = function (req) {
   function createService(name, url) {
 
     var deferred = Q.defer();
-    
+
     req({
       url: url
     }, function serviceRequest(err, res, body) {
@@ -58,7 +58,7 @@ module.exports = function (req) {
                 }
 
                 if (body['odata.error']) {
-                  return cb(body);
+                  return cb(body['odata.error']);
                 }
 
                 return cb(null, body);
@@ -70,12 +70,12 @@ module.exports = function (req) {
               req({
                 method: 'POST',
                 url: url + '/' + endpointUrl,
-                data: data,
+                body: JSON.stringify(data),
                 headers: {
                   'Accept': 'application/json',
                   'Cookie': cookie,
                   'Content-Type': 'application/json',
-                  'Content-Length': 'nnn'
+                  'Prefer': 'return-content'
                 }
               }, function (err, res, body) {
 
@@ -84,7 +84,7 @@ module.exports = function (req) {
                 }
 
                 if (body['odata.error']) {
-                  return cb(body);
+                  return cb(body['odata.error']);
                 }
 
                 return cb(null, body);
@@ -94,13 +94,14 @@ module.exports = function (req) {
             update: function (id, data, cookie, cb) {
 
               req({
-                method: 'PUT',
+                method: 'PATCH',
                 url: url + '/' + endpointUrl + '(' + id + ')',
-                data: data,
+                body: JSON.stringify(data),
                 headers: {
                   'Accept': 'application/json',
                   'Cookie': cookie,
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Prefer': 'return-content'
                 }
               }, function (err, res, body) {
 
@@ -109,7 +110,7 @@ module.exports = function (req) {
                 }
 
                 if (body['odata.error']) {
-                  return cb(body);
+                  return cb(body['odata.error']);
                 }
 
                 return cb(null, body);
@@ -132,7 +133,7 @@ module.exports = function (req) {
                 }
 
                 if (body['odata.error']) {
-                  return cb(body);
+                  return cb(body['odata.error']);
                 }
 
                 return cb(null, body);

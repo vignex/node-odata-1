@@ -88,18 +88,22 @@ describe('serviceFactory', function () {
 
     describe('endpoint operations', function () {
 
-      var factory, error, method, calledUrl;
+      var factory, error, oerror, method, calledUrl;
 
       beforeEach(function () {
 
-        error = false
+        error = false;
+        oerror = false;
         var secondQuery = false;
         factory = serviceFactory(function (args, cb) {
 
           if (secondQuery) {
             calledUrl = args.url;
             method = args.method;
-            return cb(error ? 'error' : null, null, 'data');
+            return cb(
+              error ? 'error' : null,
+              null,
+              oerror ? {'odata.error': 'odataerror'} : 'data');
           }
           secondQuery = true;
 
@@ -154,6 +158,20 @@ describe('serviceFactory', function () {
           });
       });
 
+      it('should return an error on get odata.error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            oerror = true;
+            results[0].value.test.e.get(null, null, function (err) {
+
+              expect(err).to.equal('odataerror');
+              done();
+            });
+          });
+      });
+
       it('should fire a POST request on insert', function (done) {
 
         factory.createServices({test: 'test'})
@@ -182,13 +200,27 @@ describe('serviceFactory', function () {
           });
       });
 
-      it('should fire a PUT request on update', function (done) {
+      it('should return an error on insert odata.error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            oerror = true;
+            results[0].value.test.e.insert(null, null, function (err) {
+
+              expect(err).to.equal('odataerror');
+              done();
+            });
+          });
+      });
+
+      it('should fire a PATCH request on update', function (done) {
         factory.createServices({test: 'test'})
           .then(function (results) {
 
             results[0].value.test.e.update(1, null, null, function (err, data) {
 
-              expect(method).to.equal('PUT');
+              expect(method).to.equal('PATCH');
               expect(data).to.equal('data');
               done();
             });
@@ -204,6 +236,20 @@ describe('serviceFactory', function () {
             results[0].value.test.e.update(1, null, null, function (err) {
 
               expect(err).to.equal('error');
+              done();
+            });
+          });
+      });
+
+      it('should return an error on update odata.error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            oerror = true;
+            results[0].value.test.e.update(1, null, null, function (err) {
+
+              expect(err).to.equal('odataerror');
               done();
             });
           });
@@ -232,6 +278,20 @@ describe('serviceFactory', function () {
             results[0].value.test.e.delete(null, null, function (err) {
 
               expect(err).to.equal('error');
+              done();
+            });
+          });
+      });
+
+      it('should return an error on get odata.error', function (done) {
+
+        factory.createServices({test: 'test'})
+          .then(function (results) {
+
+            oerror = true;
+            results[0].value.test.e.delete(null, null, function (err) {
+
+              expect(err).to.equal('odataerror');
               done();
             });
           });
