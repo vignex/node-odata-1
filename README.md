@@ -25,18 +25,9 @@ This will return a promise containing the potential generated endpoints for each
 
 ```javascript
 odata([{name: 'serviceOne', url: 'url1'}])
-  .then(function (results) {
+  .then(function (services) {
   
-    var services = {};
-    results.forEach(function (result) {
-    
-      var service = result.value;
-      for (var i in service) {
-        if (service.hasOwnProperty(i)) {
-          services[i] = service[i];
-        }
-      }
-    });
+    // use services
 });
 ```
 
