@@ -8,6 +8,17 @@ function oquery(id) {
 
 oquery.prototype._createId = function (arr) {
 
+  if (typeof this._id === 'object') {
+    var composite = '';
+    for (var id in this._id) {
+      /* istanbul ignore else */
+      if (this._id.hasOwnProperty(id)) {
+        composite += id + '=' + this._id[id] + ',';
+      }
+    }
+    return '(' + composite.substring(0, composite.length - 1) + ')';
+  }
+
   if (this._id === 0 || this._id) {
     return '(' + this._id + ')';
   }

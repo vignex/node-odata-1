@@ -10,6 +10,7 @@ describe('oquery', function () {
     expect(query._id).to.equal(1);
   });
 
+
   it('should have an expand function that returns this', function () {
 
     var query = new oquery();
@@ -84,6 +85,13 @@ describe('oquery', function () {
 
     var query = new oquery(1);
     expect(query.toUrl()).to.equal('(1)');
+  });
+
+
+  it('should accept an id object for composite keys', function () {
+
+    var query = new oquery({id: 1, other: 2});
+    expect(query.toUrl()).to.equal('(id=1,other=2)');
   });
 
 
