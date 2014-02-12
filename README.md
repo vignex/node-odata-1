@@ -50,6 +50,13 @@ services.someService.someEndpoint
 
     // check for errors and do something with data
   });
+
+// Or with a composite key
+services.someService.someEndpoint
+  .get(new Oquery({key1: 1, key2: 2}), cookie, funciton (error, data) {
+
+    // do stuff
+  });
 ```
 
 An insert function
