@@ -151,7 +151,31 @@ module.exports = function (req) {
     return deferred.promise;
   }
 
+
+  function createWrapper(endpoints) {
+    var deferred = Q.defer();
+
+    var services = {};
+    createServices(endpoints).then(function (results) {
+
+      results.forEach(function (result) {
+
+        var service = result.value;
+        for (var i in service) {
+          /* istanbul ignore else */
+          if (service.hasOwnProperty(i)) {
+            services[i] = service[i];
+          }
+        }
+      });
+
+      deferred.resolve(services);
+    });
+
+    return deferred.promise;
+  }
+
   return {
-    createServices: createServices
+    createServices: createWrapper
   };
 };

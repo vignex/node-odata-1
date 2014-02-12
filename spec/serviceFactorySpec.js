@@ -19,12 +19,9 @@ describe('serviceFactory', function () {
       var factory = serviceFactory({});
 
       var promise = factory.createServices({authUrl: 'someUrl'});
-      promise.then(function (results) {
+      promise.then(function (services) {
 
-        results.forEach(function (result) {
-
-          expect(result.value.login).to.exist;
-        });
+        expect(services.login).to.exist;
         done();
       });
     });
@@ -44,7 +41,7 @@ describe('serviceFactory', function () {
     });
 
 
-    it('should result an error if a url causes an error', function (done) {
+    it('should result ignore service if a url causes an error', function (done) {
 
       var factory = serviceFactory(function (args, cb) {
 
@@ -52,12 +49,9 @@ describe('serviceFactory', function () {
       });
 
       var promise = factory.createServices({test: 'test/'});
-      promise.then(function (results) {
+      promise.then(function (services) {
 
-        results.forEach(function (result) {
-
-          expect(result.reason).to.equal('error');
-        });
+        expect(services.test).to.not.exist;
         done();
       });
     });
@@ -76,12 +70,11 @@ describe('serviceFactory', function () {
       });
 
       var promise = factory.createServices({test: 'test/'});
-      promise.then(function (results) {
-        results.forEach(function (result) {
-          expect(result.value.test).to.exist;
-          expect(typeof result.value.test.e1.get).to.equal('function');
-          expect(typeof result.value.test.e2.get).to.equal('function');
-        });
+      promise.then(function (services) {
+
+        expect(services.test).to.exist;
+        expect(typeof services.test.e1.get).to.equal('function');
+        expect(typeof services.test.e2.get).to.equal('function');
         done();
       });
     });
@@ -118,9 +111,9 @@ describe('serviceFactory', function () {
       it('should fire a request to the url on get', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
-            results[0].value.test.e.get(new oquery(1), null, function (err, data) {
+            services.test.e.get(new oquery(1), null, function (err, data) {
 
               expect(method).to.equal('GET');
               expect(data).to.equal('data');
@@ -133,9 +126,9 @@ describe('serviceFactory', function () {
       it('should fire a GET request on get', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
-            results[0].value.test.e.get(null, null, function (err, data) {
+            services.test.e.get(null, null, function (err, data) {
 
               expect(method).to.equal('GET');
               expect(data).to.equal('data');
@@ -147,10 +140,10 @@ describe('serviceFactory', function () {
       it('should return an error on get error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             error = true;
-            results[0].value.test.e.get(null, null, function (err) {
+            services.test.e.get(null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -161,10 +154,10 @@ describe('serviceFactory', function () {
       it('should return an error on get odata.error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             oerror = true;
-            results[0].value.test.e.get(null, null, function (err) {
+            services.test.e.get(null, null, function (err) {
 
               expect(err).to.equal('odataerror');
               done();
@@ -175,9 +168,9 @@ describe('serviceFactory', function () {
       it('should fire a POST request on insert', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
-            results[0].value.test.e.insert(null, null, function (err, data) {
+            services.test.e.insert(null, null, function (err, data) {
 
               expect(method).to.equal('POST');
               expect(data).to.equal('data');
@@ -189,10 +182,10 @@ describe('serviceFactory', function () {
       it('should return an error on insert error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             error = true;
-            results[0].value.test.e.insert(null, null, function (err) {
+            services.test.e.insert(null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -203,10 +196,10 @@ describe('serviceFactory', function () {
       it('should return an error on insert odata.error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             oerror = true;
-            results[0].value.test.e.insert(null, null, function (err) {
+            services.test.e.insert(null, null, function (err) {
 
               expect(err).to.equal('odataerror');
               done();
@@ -216,9 +209,9 @@ describe('serviceFactory', function () {
 
       it('should fire a PATCH request on update', function (done) {
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
-            results[0].value.test.e.update(1, null, null, function (err, data) {
+            services.test.e.update(1, null, null, function (err, data) {
 
               expect(method).to.equal('PATCH');
               expect(data).to.equal('data');
@@ -230,10 +223,10 @@ describe('serviceFactory', function () {
       it('should return an error on update error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             error = true;
-            results[0].value.test.e.update(1, null, null, function (err) {
+            services.test.e.update(1, null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -244,10 +237,10 @@ describe('serviceFactory', function () {
       it('should return an error on update odata.error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             oerror = true;
-            results[0].value.test.e.update(1, null, null, function (err) {
+            services.test.e.update(1, null, null, function (err) {
 
               expect(err).to.equal('odataerror');
               done();
@@ -258,9 +251,9 @@ describe('serviceFactory', function () {
       it('should fire a DELETE request on delete', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
-            results[0].value.test.e.delete(1, null, function (err, data) {
+            services.test.e.delete(1, null, function (err, data) {
 
               expect(method).to.equal('DELETE');
               expect(data).to.equal('data');
@@ -272,10 +265,10 @@ describe('serviceFactory', function () {
       it('should return an error on delete error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             error = true;
-            results[0].value.test.e.delete(null, null, function (err) {
+            services.test.e.delete(null, null, function (err) {
 
               expect(err).to.equal('error');
               done();
@@ -286,10 +279,10 @@ describe('serviceFactory', function () {
       it('should return an error on get odata.error', function (done) {
 
         factory.createServices({test: 'test'})
-          .then(function (results) {
+          .then(function (services) {
 
             oerror = true;
-            results[0].value.test.e.delete(null, null, function (err) {
+            services.test.e.delete(null, null, function (err) {
 
               expect(err).to.equal('odataerror');
               done();
