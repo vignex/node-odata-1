@@ -16,7 +16,7 @@ npm install nodata
 This module generates endpoints based from odata service urls
 
 ```javascript
-var odata = require('odata');
+var odata = require('nodata');
 
 odata.createServices([{name: 'name', url: 'url1', {name: 'name2', url: 'url2']);
 ```
@@ -25,18 +25,9 @@ This will return a promise containing the potential generated endpoints for each
 
 ```javascript
 odata([{name: 'serviceOne', url: 'url1'}])
-  .then(function (results) {
+  .then(function (services) {
   
-    var services = {};
-    results.forEach(function (result) {
-    
-      var service = result.value;
-      for (var i in service) {
-        if (service.hasOwnProperty(i)) {
-          services[i] = service[i];
-        }
-      }
-    });
+    // use services
 });
 ```
 
@@ -52,7 +43,7 @@ services.login('username', 'password', function (error, cookie) {
 
 Each endpoint has a get function
 ```javascript
-var Oquery = require('odata').Oquery;
+var Oquery = require('nodata').Oquery;
 
 services.someService.someEndpoint
   .get(new Oquery(1).expand('someNavProp'), cookie, function (error, data) {
@@ -92,7 +83,7 @@ services.someService.someEndpoint
 An Oquery is built from an optional id
 followed by orderby, filter, expand, skip, top, inlinecount, and select
 ```javascript
-var Oqeury = require('odata').Oquery;
+var Oqeury = require('nodata').Oquery;
 
 var query = new Oquery(1).orderby('id')
   .filter('state eq 2').expand('someNavProp')
