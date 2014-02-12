@@ -39,108 +39,7 @@ module.exports = function (req) {
 
       var service = {};
       for (var i = 0; i < body.value.length; i += 1) {
-        service[body.value[i].name] = (function (endpointUrl) {
-          return {
-            get: function (query, cookie, cb) {
-
-              var q = query ? query.toUrl() : '';
-              req({
-                method: 'GET',
-                url:  url + '/' + endpointUrl + q,
-                headers: {
-                  'Accept': 'application/json',
-                  'Cookie': cookie
-                }
-              }, function (err, res, body) {
-
-                if (err) {
-                  return cb(err);
-                }
-
-                if (body['odata.error']) {
-                  return cb(body['odata.error']);
-                }
-
-                return cb(null, body);
-              });
-            },
-
-            insert: function (data, cookie, cb) {
-
-              req({
-                method: 'POST',
-                url: url + '/' + endpointUrl,
-                body: JSON.stringify(data),
-                headers: {
-                  'Accept': 'application/json',
-                  'Cookie': cookie,
-                  'Content-Type': 'application/json',
-                  'Prefer': 'return-content'
-                }
-              }, function (err, res, body) {
-
-                if (err) {
-                  return cb(err);
-                }
-
-                if (body['odata.error']) {
-                  return cb(body['odata.error']);
-                }
-
-                return cb(null, body);
-              });
-            },
-
-            update: function (id, data, cookie, cb) {
-
-              req({
-                method: 'PATCH',
-                url: url + '/' + endpointUrl + '(' + id + ')',
-                body: JSON.stringify(data),
-                headers: {
-                  'Accept': 'application/json',
-                  'Cookie': cookie,
-                  'Content-Type': 'application/json',
-                  'Prefer': 'return-content'
-                }
-              }, function (err, res, body) {
-
-                if (err) {
-                  return cb(err);
-                }
-
-                if (body['odata.error']) {
-                  return cb(body['odata.error']);
-                }
-
-                return cb(null, body);
-              });
-            },
-
-            delete: function (id, cookie, cb) {
-
-              req({
-                method: 'DELETE',
-                url: url + '/'  + endpointUrl + '(' + id + ')',
-                headers: {
-                  'Accept': 'application/json',
-                  'Cookie': cookie
-                }
-              }, function (err, res, body) {
-
-                if (err) {
-                  return cb(err);
-                }
-
-                if (body['odata.error']) {
-                  return cb(body['odata.error']);
-                }
-
-                return cb(null, body);
-              });
-            }
-          };
-        }(body.value[i].url));
+        service[body.value[i].name] = createMethods(url, body.value[i].url);
       }
 
       var s = {};
@@ -152,7 +51,113 @@ module.exports = function (req) {
   }
 
 
+  function createMethods(baseUrl, endpointUrl) {
+
+    return {
+      get: function (query, cookie, cb) {
+
+        var q = query ? query.toUrl() : '';
+        req({
+          method: 'GET',
+          url:  baseUrl + '/' + endpointUrl + q,
+          headers: {
+            'Accept': 'application/json',
+            'Cookie': cookie
+          }
+        }, function (err, res, body) {
+
+          if (err) {
+            return cb(err);
+          }
+
+          if (body['odata.error']) {
+            return cb(body['odata.error']);
+          }
+
+          return cb(null, body);
+        });
+      },
+
+      insert: function (data, cookie, cb) {
+
+        req({
+          method: 'POST',
+          url: baseUrl + '/' + endpointUrl,
+          body: JSON.stringify(data),
+          headers: {
+            'Accept': 'application/json',
+            'Cookie': cookie,
+            'Content-Type': 'application/json',
+            'Prefer': 'return-content'
+          }
+        }, function (err, res, body) {
+
+          if (err) {
+            return cb(err);
+          }
+
+          if (body['odata.error']) {
+            return cb(body['odata.error']);
+          }
+
+          return cb(null, body);
+        });
+      },
+
+      update: function (id, data, cookie, cb) {
+
+        req({
+          method: 'PATCH',
+          url: baseUrl + '/' + endpointUrl + '(' + id + ')',
+          body: JSON.stringify(data),
+          headers: {
+            'Accept': 'application/json',
+            'Cookie': cookie,
+            'Content-Type': 'application/json',
+            'Prefer': 'return-content'
+          }
+        }, function (err, res, body) {
+
+          if (err) {
+            return cb(err);
+          }
+
+          if (body['odata.error']) {
+            return cb(body['odata.error']);
+          }
+
+          return cb(null, body);
+        });
+      },
+
+      delete: function (id, cookie, cb) {
+
+        req({
+          method: 'DELETE',
+          url: baseUrl + '/'  + endpointUrl + '(' + id + ')',
+          headers: {
+            'Accept': 'application/json',
+            'Cookie': cookie
+          }
+        }, function (err, res, body) {
+
+          if (err) {
+            return cb(err);
+          }
+
+          if (body['odata.error']) {
+            return cb(body['odata.error']);
+          }
+
+          return cb(null, body);
+        });
+      }
+    };
+  }
+
+
   function createWrapper(endpoints) {
+
     var deferred = Q.defer();
 
     var services = {};
