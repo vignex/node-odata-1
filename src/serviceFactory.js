@@ -1,6 +1,5 @@
-module.exports = function (req) {
+module.exports = function (req, auth) {
 
-  var auth = require('./auth');
   var Q = require('q');
 
   function createServices(endpoints) {
@@ -15,11 +14,19 @@ module.exports = function (req) {
         auth(req, endpoints.authUrl).login(
           endpoints.preAuth.username,
           endpoints.preAuth.password,
-          function (cookie) {
+          function (err, cookie) {
 
-            queueServiceCreation(endpoints, cookie).then(function () {
+            if (err) {
+              allFinished.reject(err);
+            }
+
+            delete endpoints.preAuth;
+            queueServiceCreation(endpoints, cookie).then(function (results) {
 
               allFinished.resolve(constructServiceObject(results));
+            }, function (error) {
+
+              allFinished.reject(error);
             });
           });
       }
@@ -27,6 +34,9 @@ module.exports = function (req) {
       queueServiceCreation(endpoints).then(function (results) {
 
         allFinished.resolve(constructServiceObject(results));
+      }, function (error) {
+
+        allFinished.reject(error);
       });
     }
 
@@ -38,9 +48,8 @@ module.exports = function (req) {
 
     var services = {};
 
-    results.forEach(function (result) {
+    results.forEach(function (service) {
 
-      var service = result.value;
       for (var i in service) {
         /* istanbul ignore else */
         if (service.hasOwnProperty(i)) {
@@ -55,11 +64,12 @@ module.exports = function (req) {
 
   function queueServiceCreation(endpoints, cookie) {
 
-    var d = Q.defer();
     var calls = [];
 
     for (var e in endpoints) {
+
       if (e === 'authUrl') {
+        var d = Q.defer();
         calls.push(d.promise);
         d.resolve({login: auth(req, endpoints.authUrl).login});
       } else {
@@ -67,7 +77,7 @@ module.exports = function (req) {
       }
     }
 
-    return Q.allSettled(calls);
+    return Q.all(calls);
   }
 
 
@@ -85,17 +95,16 @@ module.exports = function (req) {
 
       if (err) {
         deferred.reject(err);
-        return;
-      }
+      } else {
+        var service = {};
+        for (var i = 0; i < body.value.length; i += 1) {
+          service[body.value[i].name] = createMethods(url, body.value[i].url);
+        }
 
-      var service = {};
-      for (var i = 0; i < body.value.length; i += 1) {
-        service[body.value[i].name] = createMethods(url, body.value[i].url);
+        var s = {};
+        s[name] = service;
+        deferred.resolve(s);
       }
-
-      var s = {};
-      s[name] = service;
-      deferred.resolve(s);
     });
 
     return deferred.promise;

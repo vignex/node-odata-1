@@ -16,7 +16,11 @@ describe('serviceFactory', function () {
 
     it('should add a login service if authUrl endpoint passed', function (done) {
 
-      var factory = serviceFactory({});
+      var factory = serviceFactory({}, function () {
+        return {
+          login: {}
+        };
+      });
 
       var promise = factory.createServices({authUrl: 'someUrl'});
       promise.then(function (services) {
@@ -53,34 +57,33 @@ describe('serviceFactory', function () {
     });
 
 
-    it('should fire auth before endpoints if preAuth specified', function () {
+    it('should fire auth before endpoints if preAuth specified', function (done) {
 
-      var url;
-      var urls = [];
-      var firstPass = true;
+      var authed;
       var factory = serviceFactory(function req(args, cb) {
 
-        if (firstPass) {
-          firstPass = false;
-          url = args.url;
-          return cb(null, {
-            headers: {'set-cookie': ['cookie']}
-          }, {value: []});
-        }
+          expect(authed).to.be.true;
+          done();
+      }, function () {
 
-        return cb({}, {}, {value: []});
+        return {
+          login: function (u, p, cb) {
+
+            authed = true;
+            cb(null, 'cookie');
+          }
+        };
       });
 
       var promise = factory.createServices({
         preAuth: {},
-        authUrl: 'auth'
+        authUrl: 'auth',
+        e1: 'e1'
       });
-
-      expect(url).to.equal('auth');
     });
 
 
-    it('should result ignore service if a url causes an error', function (done) {
+    it('should reject promise if a url causes an error', function (done) {
 
       var factory = serviceFactory(function (args, cb) {
 
@@ -88,11 +91,66 @@ describe('serviceFactory', function () {
       });
 
       var promise = factory.createServices({test: 'test/'});
-      promise.then(function (services) {
+      promise.then('', function () {
 
-        expect(services.test).to.not.exist;
         done();
       });
+    });
+
+
+    it('should reject promise if an endpoint causes an error post preAuth',
+      function (done) {
+
+        var factory = serviceFactory(function (args, cb) {
+
+          cb('error', {name: 'e1', url: 'end1'});
+        }, function () {
+          return {
+            login: function (u, p, cb) {
+              cb(null, 'cookie');
+            }
+          };
+        });
+
+        var promise = factory.createServices({
+          test: 'test/',
+          preAuth: {
+            username: 'u',
+            password: 'p'
+          },
+          authUrl: 'auth'
+        });
+        promise.then('', function () {
+
+          done();
+        });
+      });
+
+
+    it('should reject promise of preAuth fails', function (done) {
+
+      var factory = serviceFactory({}, function () {
+
+        return {
+          login: function (u, p, cb) {
+
+            cb('err');
+          }
+        };
+      });
+
+        var promise = factory.createServices({
+          preAuth: {
+            username: 'u',
+            password: 'p'
+          },
+          authUrl: 'auth'
+        })
+
+        promise.then('', function () {
+
+          done();
+        });
     });
 
 

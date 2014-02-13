@@ -7,7 +7,8 @@ var req = request.defaults({
   json: true
 });
 
-var serviceFactory = require('./serviceFactory')(req);
+var auth = require('./auth');
+var serviceFactory = require('./serviceFactory')(req, auth);
 var oquery = require('./oquery');
 
 module.exports = {
