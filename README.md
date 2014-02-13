@@ -26,9 +26,9 @@ This will return a promise containing the potential generated endpoints for each
 ```javascript
 odata([{name: 'serviceOne', url: 'url1'}])
   .then(function (services) {
-  
+
     // use services
-});
+  });
 ```
 
 If passed a 'authUrl', it will generate a login endpoint which can be used
@@ -63,7 +63,7 @@ An insert function
 ```javascript
 services.someService.someEndpoint
   .insert(someJsonItem, cookie, function (err, data) {
-  
+
     // check for errors and celebrate success
   });
 ```
@@ -81,7 +81,7 @@ And a delete function
 ```javascript
 services.someService.someEndpoint
   .delete(1, cookie, function (err, data) {
-  
+
     // check for errors and celebrate success
   });;
 ```
@@ -95,6 +95,6 @@ var Oqeury = require('nodata').Oquery;
 var query = new Oquery(1).orderby('id')
   .filter('state eq 2').expand('someNavProp')
   .skip(5).top(10).select('someNavProp').inlinecount();
-  
+
 endpoint.get(query, cookie, function () {});
 ```

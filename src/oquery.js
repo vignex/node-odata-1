@@ -5,6 +5,8 @@ function oquery(id) {
   this._id = id;
 }
 
+// Support needed for complex types
+// & deep nested nav props
 
 oquery.prototype._createId = function (arr) {
 
