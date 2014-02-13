@@ -5,18 +5,65 @@ module.exports = function (req) {
 
   function createServices(endpoints) {
 
+    var allFinished = Q.defer();
+
+    if ('preAuth' in endpoints) {
+      if (!('authUrl' in endpoints)) {
+        allFinished.reject('authUrl required for preAuth')
+      }
+      else {
+        auth(req, endpoints.authUrl).login(
+          endpoints.preAuth.username,
+          endpoints.preAuth.password,
+          function (cookie) {
+
+            queueServiceCreation(endpoints, cookie).then(function () {
+
+              allFinished.resolve(constructServiceObject(results));
+            });
+          });
+      }
+    } else {
+      queueServiceCreation(endpoints).then(function (results) {
+
+        allFinished.resolve(constructServiceObject(results));
+      });
+    }
+
+    return allFinished.promise;
+  }
+
+
+  function constructServiceObject(results) {
+
     var services = {};
 
-    var names = [];
+    results.forEach(function (result) {
+
+      var service = result.value;
+      for (var i in service) {
+        /* istanbul ignore else */
+        if (service.hasOwnProperty(i)) {
+          services[i] = service[i];
+        }
+      }
+    });
+
+    return services;
+  }
+
+
+  function queueServiceCreation(endpoints, cookie) {
+
+    var d = Q.defer();
     var calls = [];
 
     for (var e in endpoints) {
       if (e === 'authUrl') {
-        var d = Q.defer();
         calls.push(d.promise);
         d.resolve({login: auth(req, endpoints.authUrl).login});
       } else {
-        calls.push(createService(e, endpoints[e]));
+        calls.push(createService(e, cookie, endpoints[e]));
       }
     }
 
@@ -24,12 +71,16 @@ module.exports = function (req) {
   }
 
 
-  function createService(name, url) {
+  function createService(name, cookie, url) {
 
     var deferred = Q.defer();
 
     req({
-      url: url
+      url: url,
+      headers: {
+        'Accept': 'application/json',
+        'Cookie': cookie
+      }
     }, function serviceRequest(err, res, body) {
 
       if (err) {
@@ -155,32 +206,7 @@ module.exports = function (req) {
     };
   }
 
-
-  function createWrapper(endpoints) {
-
-    var deferred = Q.defer();
-
-    var services = {};
-    createServices(endpoints).then(function (results) {
-
-      results.forEach(function (result) {
-
-        var service = result.value;
-        for (var i in service) {
-          /* istanbul ignore else */
-          if (service.hasOwnProperty(i)) {
-            services[i] = service[i];
-          }
-        }
-      });
-
-      deferred.resolve(services);
-    });
-
-    return deferred.promise;
-  }
-
   return {
-    createServices: createWrapper
+    createServices: createServices
   };
 };

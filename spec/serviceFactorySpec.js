@@ -27,6 +27,18 @@ describe('serviceFactory', function () {
     });
 
 
+    it('should reject if passed preAuth without authUrl', function (done) {
+
+      var factory = serviceFactory({});
+
+      var promise = factory.createServices({preAuth: {}});
+      promise.then(null, function () {
+
+        done();
+      });
+    });
+
+
     it('should query the urls of each endpoint passed', function () {
 
       var urls = [];
@@ -38,6 +50,33 @@ describe('serviceFactory', function () {
       var res = factory.createServices({one: 'one', two: 'three'});
       expect(urls[0]).to.equal('one');
       expect(urls[1]).to.equal('three');
+    });
+
+
+    it('should fire auth before endpoints if preAuth specified', function () {
+
+      var url;
+      var urls = [];
+      var firstPass = true;
+      var factory = serviceFactory(function req(args, cb) {
+
+        if (firstPass) {
+          firstPass = false;
+          url = args.url;
+          return cb(null, {
+            headers: {'set-cookie': ['cookie']}
+          }, {value: []});
+        }
+
+        return cb({}, {}, {value: []});
+      });
+
+      var promise = factory.createServices({
+        preAuth: {},
+        authUrl: 'auth'
+      });
+
+      expect(url).to.equal('auth');
     });
 
 
